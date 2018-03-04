@@ -9,6 +9,11 @@ import json
 from ...utils.box import BoundBox
 from ...cython_utils.cy_yolo2_findboxes import box_constructor
 
+from googletrans import Translator
+
+translation_language = 'de'
+translator = Translator()
+
 def expit(x):
 	return 1. / (1. + np.exp(-x))
 
@@ -54,8 +59,9 @@ def postprocess(self, net_out, im, save = True):
 		cv2.rectangle(imgcv,
 			(left, top), (right, bot),
 			colors[max_indx], thick)
-		cv2.putText(imgcv, mess, (left, top - 12),
-			0, 1e-3 * h, colors[max_indx],thick//3)
+		translated_mess = translator.translate(mess, dest=translation_language)
+		cv2.putText(imgcv, translated_mess.text, (left, top - 12),
+			0, 1e-3 * h * 3, colors[max_indx],thick)
 
 	if not save: return imgcv
 
