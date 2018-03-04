@@ -1,3 +1,19 @@
+## Changes made by RyanJennings1
+### Intro
+I'm using this repo as a basis for my Final Year Project in University.
+My FYP involves machine learning object translation and translation
+into a target language.
+
+### Changes
+I have used the `googletrans` python module in `darkflow/net/yolov2/predict.py`
+to translate the predicted labels into a target language.
+I have also made the box label of the output more easy to read.
+I will be implementing many more changes between now and December 2018.
+
+
+
+
+
 ## Intro
 
 [![Build Status](https://travis-ci.org/thtrieu/darkflow.svg?branch=master)](https://travis-ci.org/thtrieu/darkflow) [![codecov](https://codecov.io/gh/thtrieu/darkflow/branch/master/graph/badge.svg)](https://codecov.io/gh/thtrieu/darkflow)
