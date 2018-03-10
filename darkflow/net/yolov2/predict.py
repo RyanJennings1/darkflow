@@ -77,6 +77,13 @@ def postprocess(self, net_out, im, save = True):
                         0, 1e-3 * h * 3, colors[0],thick)
 			#0, 1e-3 * h * 3, colors[max_indx],thick)
 		fontpil = ImageFont.truetype(os.path.join(self.FLAGS.imgdir, '../arialunicodems.ttf'), int(h * 0.05))
+
+		# thick outline
+		drawpil.text((left-1, top-1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+		drawpil.text((left+1, top-1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+		drawpil.text((left-1, top+1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+		drawpil.text((left+1, top+1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+
 		drawpil.text((left, top), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), fill=tuple(map(int, colors[9])), font=fontpil)
 		drawpil.rectangle(((left, top), (right, bot)), fill=None, outline=tuple(map(int, colors[9])))
 		#outpil = os.path.join(self.FLAGS.imgdir, 'out')
