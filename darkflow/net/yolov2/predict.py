@@ -11,7 +11,11 @@ from ...cython_utils.cy_yolo2_findboxes import box_constructor
 
 from googletrans import Translator
 
-translation_language = 'de'
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+
+
 translator = Translator()
 
 def expit(x):
@@ -45,6 +49,10 @@ def postprocess(self, net_out, im, save = True):
 	else: imgcv = im
 	h, w, _ = imgcv.shape
 	
+	outpil = os.path.join(self.FLAGS.imgdir, 'out')
+	imgpil = Image.open(os.path.join(self.FLAGS.imgdir, os.path.basename(im)))
+	drawpil = ImageDraw.Draw(imgpil)
+	#fontpil = ImageFont.truetype(os.path.join(self.FLAGS.imgdir, '../arialunicodems.ttf'), 30)
 	resultsForJSON = []
 	for b in boxes:
 		boxResults = self.process_box(b, h, w, threshold)
@@ -58,10 +66,21 @@ def postprocess(self, net_out, im, save = True):
 
 		cv2.rectangle(imgcv,
 			(left, top), (right, bot),
-			colors[max_indx], thick)
-		translated_mess = translator.translate(mess, dest=translation_language)
-		cv2.putText(imgcv, translated_mess.text, (left, top - 12),
-			0, 1e-3 * h * 3, colors[max_indx],thick)
+			colors[0], thick)
+			#colors[max_indx], thick)
+			#'white', thick)
+		if self.FLAGS.language:
+			translated_mess = translator.translate(mess, dest=self.FLAGS.language)
+		else:
+			translated_mess = translator.translate(mess, dest='en')
+		cv2.putText(imgcv, translated_mess.text + ' ' + str(float('%.2f' % confidence)), (left, top - 12),
+                        0, 1e-3 * h * 3, colors[0],thick)
+			#0, 1e-3 * h * 3, colors[max_indx],thick)
+		fontpil = ImageFont.truetype(os.path.join(self.FLAGS.imgdir, '../arialunicodems.ttf'), int(h * 0.05))
+		drawpil.text((left, top), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), fill=tuple(map(int, colors[9])), font=fontpil)
+		drawpil.rectangle(((left, top), (right, bot)), fill=None, outline=tuple(map(int, colors[9])))
+		#outpil = os.path.join(self.FLAGS.imgdir, 'out')
+		imgpil.save(os.path.join(outpil, os.path.basename(im)))
 
 	if not save: return imgcv
 
@@ -74,4 +93,4 @@ def postprocess(self, net_out, im, save = True):
 			f.write(textJSON)
 		return
 
-	cv2.imwrite(img_name, imgcv)
+	#cv2.imwrite(img_name, imgcv)
