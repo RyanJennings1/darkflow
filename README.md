@@ -1,14 +1,13 @@
 ## Changes made by RyanJennings1
 ### Intro
-I'm using this repo as a basis for my Final Year Project in University.
-My FYP involves machine learning object translation and translation
-into a target language.
+I'm using this repo as a basis for my Final Year Project of my Undergrad degree in the University of Limerick.
+My FYP involves machine learning object translation and translation into a target language.
+A pdf of the paper can be found here: TODO PUT THIS LINK IN
 
 ### Changes
-I have used the `googletrans` python module in `darkflow/net/yolov2/predict.py`
-to translate the predicted labels into a target language.
-I have also made the box label of the output more easy to read.
-I will be implementing many more changes between now and December 2018.
+* I have used the `googletrans` python module in `darkflow/net/yolov2/predict.py` to translate the predicted labels into a target language.
+* I decided to use PIL to write the text to the output as previously this code only supported ascii characters but my need to translate into multiple languages meant I needed to translate into multiple alphabets.
+* I have also made the box label of the output more easy to read.
 
 
 
