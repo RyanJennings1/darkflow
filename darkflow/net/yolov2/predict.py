@@ -59,7 +59,7 @@ def postprocess(self, net_out, im, save=True):
         if boxResults is None:
             continue
         left, right, top, bot, mess, max_indx, confidence = boxResults
-        print('confidence: {}'.format(confidence))
+        # print('confidence: {}'.format(confidence))
         if confidence > 0.5:
             thick = int((h + w) // 300)
             if self.FLAGS.json:

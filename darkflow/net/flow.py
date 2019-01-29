@@ -103,10 +103,23 @@ def return_predict(self, im):
 
 import math
 
-def predict(self):
-    inp_path = self.FLAGS.imgdir
+def predict(self, inp_path=False):
+    """
+       If inp_path isn't passed then set
+       inp_path to be whatever the imgdir
+       flag is.
+       Else if a value is passed set the
+       imgdir flag to the passed value
+    """
+    if not inp_path:
+        inp_path = self.FLAGS.imgdir
+    else:
+        self.FLAGS.imgdir = inp_path
+
+    # Create a list of files in input path
     all_inps = os.listdir(inp_path)
     all_inps = [i for i in all_inps if self.framework.is_inp(i)]
+    # If no inputs in folder found, exit
     if not all_inps:
         msg = 'Failed to find any images in {} .'
         exit('Error: {}'.format(msg.format(inp_path)))
@@ -127,7 +140,7 @@ def predict(self):
 
         # Feed to the net
         feed_dict = {self.inp : np.concatenate(inp_feed, 0)}    
-        self.say('Forwarding {} inputs ...'.format(len(inp_feed)))
+        self.say('Forwarding {} input(s) ...'.format(len(inp_feed)))
         start = time.time()
         out = self.sess.run(self.out, feed_dict)
         stop = time.time(); last = stop - start
@@ -135,7 +148,7 @@ def predict(self):
             last, len(inp_feed), len(inp_feed) / last))
 
         # Post processing
-        self.say('Post processing {} inputs ...'.format(len(inp_feed)))
+        self.say('Post processing {} input(s) ...'.format(len(inp_feed)))
         start = time.time()
         pool.map(lambda p: (lambda i, prediction:
             self.framework.postprocess(

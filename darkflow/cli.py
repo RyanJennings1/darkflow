@@ -1,6 +1,7 @@
 from .defaults import argHandler #Import the default arguments
 import os
 from .net.build import TFNet
+from .server import Server
 
 def cliHandler(args):
     FLAGS = argHandler()
@@ -38,4 +39,21 @@ def cliHandler(args):
         print('Rebuild a constant version ...')
         tfnet.savepb(); exit('Done')
 
-    tfnet.predict()
+    # tfnet.predict()
+    print('Should be predicting here')
+
+    # Set up server
+    server = Server(tfnet=tfnet)
+    server.run()
+
+    """
+    Ask if they want another prediction.
+    Will be replaced with an interface
+    for serving img post requests
+    val = 'y'
+    while (val == 'y'):
+        val = input('Predict new dir? [y/N] ')
+        if val == 'y':
+            # new_dir = input('Enter dir name: ')
+            # tfnet.predict(inp_path=new_dir)
+    """

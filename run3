@@ -1,0 +1,9 @@
+#/usr/bin/env bash
+
+imagesnap -w 1 test.png
+mkdir -p test_dir
+mv test.png test_dir/
+# ./flow --imgdir test_dir/ --model cfg/yolo.cfg --load bin/yolo.weights --language ru
+python3 client.py --address 10.52.66.87
+open outputimg.png
+

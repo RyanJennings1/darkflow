@@ -1,0 +1,8 @@
+#/usr/bin/env bash
+
+imagesnap -w 1 test.png
+mkdir -p test_dir
+mv test.png test_dir/
+./flow --imgdir test_dir/ --model cfg/yolo.cfg --load bin/yolo.weights --language ru
+open test_dir/out/test.png
+

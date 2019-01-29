@@ -1,0 +1,5 @@
+#/usr/bin/env bash
+
+./flow --imgdir dog_dir/ --model cfg/yolo.cfg --load bin/yolo.weights --language ga
+open dog_dir/out/sample_dog.jpg
+
