@@ -1,22 +1,20 @@
-import numpy as np
-import math
-import cv2
-import os
 import json
+import math
+import os
+
 #from scipy.special import expit
 #from utils.box import BoundBox, box_iou, prob_compare
 #from utils.box import prob_compare2, box_intersection
 from ...utils.box import BoundBox
 from ...cython_utils.cy_yolo2_findboxes import box_constructor
 
+import cv2
 from googletrans import Translator
+import numpy as np
 
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
-
-
-translator = Translator()
 
 def expit(x):
     return 1. / (1. + np.exp(-x))
@@ -39,6 +37,8 @@ def postprocess(self, net_out, im, save=True):
     """
     boxes = self.findboxes(net_out)
 
+    confidence_threshold = 0.5
+
     # meta
     meta = self.meta
     threshold = meta['thresh']
@@ -52,44 +52,42 @@ def postprocess(self, net_out, im, save=True):
     outpil = os.path.join(self.FLAGS.imgdir, 'out')
     imgpil = Image.open(os.path.join(self.FLAGS.imgdir, os.path.basename(im)))
     drawpil = ImageDraw.Draw(imgpil)
-    #fontpil = ImageFont.truetype(os.path.join(self.FLAGS.imgdir, '../arialunicodems.ttf'), 30)
+
     resultsForJSON = []
+
+    # Boxes is the list of prediction boxes in the image
     for b in boxes:
         boxResults = self.process_box(b, h, w, threshold)
         if boxResults is None:
             continue
-        left, right, top, bot, mess, max_indx, confidence = boxResults
-        # print('confidence: {}'.format(confidence))
-        if confidence > 0.5:
+        left, right, top, bot, label, max_indx, confidence = boxResults
+
+        if confidence > confidence_threshold:
             thick = int((h + w) // 300)
             if self.FLAGS.json:
-                resultsForJSON.append({"label": mess, "confidence": float('%.2f' % confidence), "topleft": {"x": left, "y": top}, "bottomright": {"x": right, "y": bot}})
+                resultsForJSON.append({"label": label, "confidence": float('%.2f' % confidence), "topleft": {"x": left, "y": top}, "bottomright": {"x": right, "y": bot}})
                 continue
 
-            cv2.rectangle(imgcv,
-                          (left, top), (right, bot),
-                          colors[0], thick)
-                          #colors[max_indx], thick)
-                          #'white', thick)
+            predicted_text = label
+
             if self.FLAGS.language:
-                translated_mess = translator.translate(mess, dest=self.FLAGS.language)
-            else:
-                translated_mess = translator.translate(mess, dest='en')
-            cv2.putText(imgcv, translated_mess.text + ' ' + str(float('%.2f' % confidence)), (left, top - 12),
-                        0, 1e-3 * h * 3, colors[0],thick)
-                        #0, 1e-3 * h * 3, colors[max_indx],thick)
+                translator = Translator()
+                predicted_text = translator.translate(label, dest=self.FLAGS.language)
+
             fontpil = ImageFont.truetype(os.path.join(self.FLAGS.imgdir, '../arialunicodems.ttf'), int(h * 0.05))
 
-            # thick outline
-            drawpil.text((left-1, top-1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
-            drawpil.text((left+1, top-1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
-            drawpil.text((left-1, top+1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
-            drawpil.text((left+1, top+1), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+            # Draw a thick outline of the text
+            drawpil.text((left-1, top-1),
+                         str(predicted_text.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+            drawpil.text((left+1, top-1),
+                         str(predicted_text.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+            drawpil.text((left-1, top+1),
+                         str(predicted_text.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
+            drawpil.text((left+1, top+1),
+                         str(predicted_text.text) + ' ' + str(float('%.2f' % confidence)), (0, 0, 0), font=fontpil)
 
-            drawpil.text((left, top), str(translated_mess.text) + ' ' + str(float('%.2f' % confidence)), fill=tuple(map(int, colors[9])), font=fontpil)
+            drawpil.text((left, top), str(predicted_text.text) + ' ' + str(float('%.2f' % confidence)), fill=tuple(map(int, colors[9])), font=fontpil)
             drawpil.rectangle(((left, top), (right, bot)), fill=None, outline=tuple(map(int, colors[9])))
-            #outpil = os.path.join(self.FLAGS.imgdir, 'out')
-            imgpil.save(os.path.join(outpil, os.path.basename(im)))
 
         if not save: return imgcv
 
@@ -102,4 +100,4 @@ def postprocess(self, net_out, im, save=True):
                 f.write(textJSON)
             return
 
-        #cv2.imwrite(img_name, imgcv)
+        imgpil.save(os.path.join(outpil, os.path.basename(im)))
