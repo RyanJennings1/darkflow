@@ -40,20 +40,8 @@ def cliHandler(args):
         tfnet.savepb(); exit('Done')
 
     # tfnet.predict()
-    print('Should be predicting here')
+    print('Preparing to initialise server ...')
 
     # Set up server
     server = Server(tfnet=tfnet)
     server.run()
-
-    """
-    Ask if they want another prediction.
-    Will be replaced with an interface
-    for serving img post requests
-    val = 'y'
-    while (val == 'y'):
-        val = input('Predict new dir? [y/N] ')
-        if val == 'y':
-            # new_dir = input('Enter dir name: ')
-            # tfnet.predict(inp_path=new_dir)
-    """
